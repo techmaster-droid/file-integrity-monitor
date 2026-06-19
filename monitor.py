@@ -1,41 +1,65 @@
+from pathlib import Path
 import hashlib
+import os
+import json 
 
-choice = input("""Choose 1 or 2 from the choice
-1. Create Baseline Hash
-2. Check File Integrity
-               
-Enter choice: """)
-
-if choice == "1":
-
-    file_name = input("Enter the file name: ")+".txt"
-    hash_file = input("Enter the file to save the hash number: ")+".txt"
-    with open(file_name, "r") as file:
-        content = file.read()
-        content_byte = content.encode()
-        content_hash = hashlib.sha256(content_byte)
-        content_hash_readable = content_hash.hexdigest()
+def hash_the_file(folder):
+    txt_files = [f for f in os.listdir(folder) if f.endswith(".txt") and os.path.isfile(os.path.join(folder, f))]
+    hash_storage = {}
     
+    for files in txt_files:
+        hasher = hashlib.sha256()
+        with open(folder/files, "rb") as file:
+            while (chunk := file.read(4096)):
+                hasher.update(chunk)
+        hash_digest = hasher.hexdigest()
+        hash_storage[files] = hash_digest
+    
+    with open("hashes.json", "w") as file:
+        json.dump(hash_storage, file, indent=4)
+        print("Succesfully saved")
 
-    with open(hash_file, "w") as file:
-        file.write(content_hash_readable)
-        print("Successfully saved your hash code....")
+file_path = input("Enter your folder path: ")
+folder_path = Path(file_path)
+choice = int(input("""Choose the choice:-
+1 for creating a hash code for your folder
+2 for checking the integrity of the files :- """))
 
-elif choice == "2":
-    to_check = input("Enter the hash file name you saved: ")+".txt"
-    your_file = input("Enter your file name to check is it modified: ")+".txt"
-    with open(your_file, 'r') as file:
-        your_content = file.read()
-        your_content_byte = your_content.encode()
-        your_content_hash = hashlib.sha256(your_content_byte)
-        your_content_hash_readable = your_content_hash.hexdigest()
-    with open(to_check,"r") as file:
-        hash_content = file.read()
+if choice == 1:
+    hash_the_file(folder_path)
 
-    if hash_content == your_content_hash_readable:
-        print("File integrity verified")
-    else:
-        print("ALERT: Your file is Modified")
+elif choice == 2:
+    txt_files = [f for f in os.listdir(folder_path) if f.endswith(".txt") and os.path.isfile(os.path.join(folder_path, f))]
+    hash_storage = {}
+    for files in txt_files:
+        hasher = hashlib.sha256()
+        with open(folder_path/files, 'rb') as file:
+            while (chunk := file.read(4096)):
+                hasher.update(chunk)
+            hash_digest = hasher.hexdigest()
+            hash_storage[files] = hash_digest
 
-else:
-    print("Choose correct choice")
+    with open("hashes.json", "rb") as file:
+        data = json.load(file)
+
+    same_code = []
+    different_code = []
+
+    for code in data:
+        if code not in hash_storage:
+            print(f"[ALERT] {code} deleted")
+
+        
+        elif data[code] != hash_storage[code]:
+            different_code.append(code)
+        else:
+            print(f"[OK] {code}")
+
+    if different_code:
+        print("\nALERT: Changed files are:-")
+        for word in different_code:
+            print(word)
+
+    for files in txt_files:
+        if files not in data:
+            print(f"[ALERT] {files} added")

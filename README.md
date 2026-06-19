@@ -7,11 +7,13 @@ File Integrity Monitor is a Python-based cybersecurity tool that uses SHA-256 ha
 A hash acts like a digital fingerprint for a file. Even a small change in the file content produces a completely different hash value. By comparing a stored baseline hash with the current hash, the tool can determine whether the file has been altered.
 
 ## Features 
-- Create a baseline SHA-256 hash for a file
-- Save the generated hash to a separate file
-- Verify file integrity by comparing hashes
-- Detect file modifications
-- Menu-driven interface
+
+- Create SHA-256 baselines for an entire directory
+- Store hashes in JSON format
+- Detect modified files
+- Detect deleted files
+- Detect newly added files
+- Chunk-based hashing for large files
 
 # Technologies
 - Python
@@ -23,26 +25,34 @@ python monitor.py
 
 ## Example output
 
-Choose 1 or 2 from the choice
-1. Create Baseline Hash
-2. Check File Integrity
-               
-Enter choice: 2
-Enter the hash file name you saved: hash
-Enter your file name to check is it modified: test
-ALERT: Your file is Modified
+Enter your folder path: D:\cyber-learning\3.File-Integrity-Monitor\test
+Choose the choice:-
+1 for creating a hash code for your folder
+2 for checking the integrity of the files :- 2
+[OK] test - Copy.txt
+[ALERT] test.txt deleted
+[ALERT] test3.txt added
 
 ## Cybersecurity Concepts Learned
 
+- File Integrity Monitoring (FIM)
 - Cryptographic Hashing
 - SHA-256
-- File Integrity Monitoring
 - Baseline Comparison
 - Security Monitoring
+- Change Detection
+
+## Limitations
+
+- hashes.json can be modified or deleted
+- No real-time monitoring
+- No alerting system
+- Only monitors .txt files
 
 ## Future improvements
 
-- Support multiple file types
-- Store hashes in JSON format
-- Monitor multiple files simultaneously
-- Add exception handling for missing files
+- HMAC-protected baseline storage
+- Recursive directory monitoring
+- Real-time monitoring
+- Email or log alerts
+- Support for all file types
